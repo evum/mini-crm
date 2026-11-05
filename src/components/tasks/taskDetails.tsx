@@ -14,6 +14,7 @@ import { useTaskDetails, useTaskHistory } from '@/hooks/useDetails';
 import { objectHref } from '@/hooks/useRoute';
 import { formatDateTime, statuses } from '@/lib/crm';
 import { TaskStatusActions } from './taskStatusActions';
+import { TaskManagement } from './taskManagement';
 
 type Props = WorkspaceProps & { taskId: string };
 
@@ -60,6 +61,13 @@ export function TaskDetailsScreen({ taskId, ...props }: Props) {
 								{statuses[details.data.task.status].label}
 							</span>
 						</div>
+						{props.profile.role === 'dispatcher' && (
+							<TaskManagement
+								userId={props.profile.id}
+								details={details.data}
+								refreshing={details.isFetching}
+							/>
+						)}
 					</header>
 					<div className='grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'>
 						<section

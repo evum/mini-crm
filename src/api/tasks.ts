@@ -10,6 +10,47 @@ import {
 import type { TaskStatus } from '@/lib/crm';
 import type { Tables } from '@/lib/database.types';
 
+export type TaskInput = {
+	title: string;
+	description: string;
+	objectId: string;
+	assigneeId: string;
+};
+
+export async function createTask(input: TaskInput) {
+	const { data, error } = await getApiClient()
+		.rpc('create_task', {
+			p_title: input.title.trim(),
+			p_description: input.description.trim(),
+			p_object_id: input.objectId,
+			p_assignee_id: input.assigneeId
+		})
+		.single<Tables<'tasks'>>();
+	if (error) throw error;
+	if (!data) throw new Error('Task was not returned');
+	return data;
+}
+
+export async function updateTask(input: TaskInput & { id: string }) {
+	const { data, error } = await getApiClient()
+		.rpc('update_task', {
+			p_task_id: input.id,
+			p_title: input.title.trim(),
+			p_description: input.description.trim(),
+			p_object_id: input.objectId,
+			p_assignee_id: input.assigneeId
+		})
+		.single<Tables<'tasks'>>();
+	if (error) throw error;
+	if (!data) throw new Error('Task was not returned');
+	return data;
+}
+
+export async function deleteTask(id: string) {
+	const { error } = await getApiClient().rpc('delete_task', { p_task_id: id });
+	if (error) throw error;
+}
+
 export type ChangeTaskStatusInput = {
 	taskId: string;
 	expectedStatus: TaskStatus;

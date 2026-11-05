@@ -14,6 +14,8 @@ import {
 import { useObjectDetails, useObjectTasks } from '@/hooks/useDetails';
 import { taskHref } from '@/hooks/useRoute';
 import { formatDate, statuses, type TaskStatus } from '@/lib/crm';
+import { ObjectManagement } from './objectManagement';
+import { CreateTaskButton } from '@/components/tasks/taskManagement';
 
 type Props = WorkspaceProps & { objectId: string };
 
@@ -82,11 +84,29 @@ export function ObjectDetailsScreen({ objectId, ...props }: Props) {
 								</div>
 							))}
 						</dl>
+						{props.profile.role === 'dispatcher' && (
+							<ObjectManagement
+								userId={props.profile.id}
+								details={details.data}
+								refreshing={details.isFetching}
+							/>
+						)}
 					</header>
 					<section aria-labelledby='object-tasks-title'>
 						<h2 id='object-tasks-title' className='mb-5 text-xl font-semibold'>
 							Задачи объекта
 						</h2>
+						{props.profile.role === 'dispatcher' &&
+							details.data.permissions.can_create_task && (
+								<div className='mb-5'>
+									<CreateTaskButton
+										userId={props.profile.id}
+										objectId={objectId}
+										objectName={details.data.object.name}
+										disabled={details.isFetching}
+									/>
+								</div>
+							)}
 						<div className='mb-6 flex flex-wrap gap-3'>
 							<SearchForm
 								placeholder='Поиск по названию или описанию'

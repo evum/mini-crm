@@ -13,6 +13,7 @@ import {
 } from '@/components/workspace/listControls';
 import { listObjects } from '@/api/objects';
 import Object from './object';
+import { CreateObjectButton } from './objectManagement';
 
 export function Objects(props: WorkspaceProps) {
 	const executor = props.profile.role === 'executor';
@@ -39,13 +40,16 @@ export function Objects(props: WorkspaceProps) {
 				{objects.data && !objects.error && (
 					<span className='rounded-lg border bg-white px-4 py-2 text-sm text-muted-foreground'>
 						Найдено объектов:{' '}
-						<strong className='text-foreground'>
-							{objects.data.total}
-						</strong>
+						<strong className='text-foreground'>{objects.data.total}</strong>
 					</span>
 				)}
 			</div>
 			<div className='mb-6'>
+				{!executor && (
+					<div className='mb-5'>
+						<CreateObjectButton userId={props.profile.id} />
+					</div>
+				)}
 				<SearchForm
 					placeholder='Поиск по названию или адресу'
 					onSearch={(search) => setFilters({ search, page: 0 })}
@@ -54,10 +58,7 @@ export function Objects(props: WorkspaceProps) {
 			{objects.isPending ? (
 				<ListLoading />
 			) : objects.error ? (
-				<ListError
-					error={objects.error}
-					retry={() => void objects.refetch()}
-				/>
+				<ListError error={objects.error} retry={() => void objects.refetch()} />
 			) : objects.data.items.length === 0 ? (
 				<EmptyList
 					filtered={Boolean(filters.search)}
@@ -73,7 +74,7 @@ export function Objects(props: WorkspaceProps) {
 					aria-label={executor ? 'Мои объекты' : 'Объекты'}
 				>
 					{objects.data.items.map((object) => (
-						<Object object={object} />
+						<Object key={object.id} object={object} />
 					))}
 				</ul>
 			)}
@@ -81,9 +82,7 @@ export function Objects(props: WorkspaceProps) {
 				<Pagination
 					page={filters.page}
 					total={objects.data.total}
-					setPage={(page) =>
-						setFilters((current) => ({ ...current, page }))
-					}
+					setPage={(page) => setFilters((current) => ({ ...current, page }))}
 					busy={objects.isFetching}
 				/>
 			)}
