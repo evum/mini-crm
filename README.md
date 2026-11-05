@@ -1,0 +1,3 @@
+# mini-crm
+
+Мини CRM.
